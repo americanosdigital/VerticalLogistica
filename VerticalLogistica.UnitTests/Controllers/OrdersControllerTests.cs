@@ -152,7 +152,8 @@ namespace VerticalLogistica.Tests.Controllers
             var result = await _controller.UploadOrderFile(fileMock.Object);
 
             // Assert
-            result.Should().BeOfType<OkResult>();
+            var okResult = result as OkObjectResult;
+            okResult!.Value.Should().BeEquivalentTo(new { Message = "Arquivo processado com sucesso." });
             _mockService.Verify(s => s.ProcessOrderFileAsync(It.IsAny<Stream>()), Times.Once);
         }
 

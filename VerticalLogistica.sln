@@ -23,6 +23,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5 - Tests", "5 - Tests", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerticalLogistica.Tests", "VerticalLogistica.UnitTests\VerticalLogistica.Tests.csproj", "{9D46AC18-D2C8-4FE9-B9EA-85611C32935E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solucao", "Itens de Solucao", "{3524EEA1-3810-4834-95A3-408A7191A462}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F155B4FF-CF61-4CF7-8272-D285D7D7CC0A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{28BB6B07-655C-44A7-B031-BE21F4447B2B}"
+	ProjectSection(SolutionItems) = preProject
+		build.yml = build.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +71,7 @@ Global
 		{4AEFF212-1B29-40A2-A04E-0B92A0BC375C} = {C6183EC3-3A6A-4160-A011-A9DECA119C8E}
 		{C0920FFD-35C6-4D81-9687-38AD6715AFD2} = {5F5A3AEC-C77E-4257-8EF6-FC783DD494DB}
 		{9D46AC18-D2C8-4FE9-B9EA-85611C32935E} = {E9D91D47-6CC5-43E8-9911-75AEAFD3DD26}
+		{28BB6B07-655C-44A7-B031-BE21F4447B2B} = {F155B4FF-CF61-4CF7-8272-D285D7D7CC0A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D1BCB2F3-F0C7-4E18-9993-7B5FF2CBAD82}
