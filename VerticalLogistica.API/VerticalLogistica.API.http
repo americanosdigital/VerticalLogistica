@@ -1,6 +1,6 @@
 @VerticalLogistica.API_HostAddress = http://localhost:5092
 
-GET {{VerticalLogistica.API_HostAddress}}/weatherforecast/
+GET {{VerticalLogistica.API_HostAddress}}/VerticalLogistica/
 Accept: application/json
 
 ###

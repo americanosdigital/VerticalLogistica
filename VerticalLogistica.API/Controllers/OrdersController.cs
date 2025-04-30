@@ -30,7 +30,6 @@ namespace VerticalLogistica.API.Controllers
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null)
         {
-            // Create filter if any filter parameter is provided
             OrderFilter? filter = null;
             if (orderId.HasValue || startDate.HasValue || endDate.HasValue)
             {
@@ -52,19 +51,18 @@ namespace VerticalLogistica.API.Controllers
         /// <param name="file">Order file in the legacy format</param>
         /// <returns>Action result</returns>
         [HttpPost("upload")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UploadOrderFile(IFormFile? file)
         {
             if (file == null || file.Length == 0)
-            {
-                return BadRequest("No file was uploaded.");
-            }
+                return BadRequest("Nenhum arquivo foi enviado.");
 
             using var stream = file.OpenReadStream();
             await _orderService.ProcessOrderFileAsync(stream);
 
-            return Ok();
+            return Ok(new { Message = "Arquivo processado com sucesso." });
         }
     }
 }

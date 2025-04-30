@@ -1,56 +1,76 @@
-// VerticalLogistica.API/Program.cs
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using VerticalLogistica.Application;
 using VerticalLogistica.Infrastructure;
+using VerticalLogistica.Infrastructure.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
+// 1. MVC e JSON
+builder.Services
+    .AddControllers()
+    .AddNewtonsoftJson();
 
-// Register application services
+// 2. Domain/Application/Infrastructure
 builder.Services.AddApplication();
-
-// Register infrastructure services
 builder.Services.AddInfrastructure();
 
-// Configure Swagger/OpenAPI
+// 3. DbContext SQL Server
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 4. Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
+
+// Primeiro registre o SwaggerGen
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "Vertical Logistica API",
         Version = "v1",
-        Description = "API para processamento de pedidos do sistema legado"
+        Description = "API para processamento de pedidos do sistema legado",
+        Contact = new OpenApiContact
+        {
+            Name = "Wellington Americano",
+            Email = "americanosdigital@gmail.com"
+        }
     });
 });
 
-// Configure CORS
+// Em seguida adicione o suporte ao Newtonsoft no Swagger (no IServiceCollection)
+builder.Services.AddSwaggerGenNewtonsoftSupport();
+
+// 5. CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("DefaultPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy
+            .WithOrigins("http://localhost:4200", "https://localhost:7183")
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 6. Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Vertical Logistica API v1"));
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Vertical Logistica API v1");
+        c.RoutePrefix = string.Empty;
+    });
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("DefaultPolicy");
 app.UseAuthorization();
 app.MapControllers();
 

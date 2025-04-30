@@ -15,7 +15,7 @@ using VerticalLogistica.Domain.Filters;
 using VerticalLogistica.Domain.Interfaces;
 using VerticalLogistica.API.Controllers;
 
-namespace VerticalLogistica.Tests
+namespace VerticalLogistica.Tests.Controllers
 {
     public class OrdersControllerTests
     {

@@ -11,7 +11,7 @@ using VerticalLogistica.Domain.Filters;
 using VerticalLogistica.Domain.Interfaces;
 using VerticalLogistica.Infrastructure.Repositories;
 
-namespace VerticalLogistica.Tests
+namespace VerticalLogistica.Tests.Repositories
 {
     public class OrderRepositoryTests
     {

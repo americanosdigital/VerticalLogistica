@@ -7,7 +7,7 @@ using Xunit;
 using FluentAssertions;
 using VerticalLogistica.Infrastructure.Parsers;
 
-namespace VerticalLogistica.Tests
+namespace VerticalLogistica.Tests.Parsers
 {
     public class OrderParserTests
     {
@@ -16,10 +16,11 @@ namespace VerticalLogistica.Tests
         {
             // Arrange
             var fileContent =
-                "0000000002 Medeiros                                     00000123450000000111 256.2420201201\n" +
-                "0000000001 Zarelli                                      00000001230000000111 512.2420211201\n" +
-                "0000000001 Zarelli                                      00000001230000000122 512.2420211201\n" +
-                "0000000002 Medeiros                                     00000123450000000122 256.2420201201";
+     "0000000002" + "Medeiros".PadRight(45) + "0000012345" + "0000000111" + "000000256.24" + "20201201" + "\n" +
+     "0000000001" + "Zarelli".PadRight(45) + "0000000123" + "0000000111" + "000000512.24" + "20211201" + "\n" +
+     "0000000001" + "Zarelli".PadRight(45) + "0000000123" + "0000000122" + "000000512.24" + "20211201" + "\n" +
+     "0000000002" + "Medeiros".PadRight(45) + "0000012345" + "0000000122" + "000000256.24" + "20201201";
+
 
             var streamReader = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(fileContent)));
             var parser = new OrderParser();
@@ -62,9 +63,10 @@ namespace VerticalLogistica.Tests
         {
             // Arrange
             var fileContent =
-                "0000000002 Medeiros                                     00000123450000000111 256.2420201201\n" +
-                "InvalidLine\n" +
-                "0000000001 Zarelli                                      00000001230000000111 512.2420211201";
+    "0000000002" + "Medeiros".PadRight(45) + "0000012345" + "0000000111" + "000000256.24" + "20201201" + "\n" +
+    "InvalidLine\n" +
+    "0000000001" + "Zarelli".PadRight(45) + "0000000123" + "0000000111" + "000000512.24" + "20211201";
+
 
             var streamReader = new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(fileContent)));
             var parser = new OrderParser();

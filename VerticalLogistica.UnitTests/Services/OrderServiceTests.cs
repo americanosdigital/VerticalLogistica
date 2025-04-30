@@ -12,7 +12,7 @@ using VerticalLogistica.Domain.Entities;
 using VerticalLogistica.Domain.Filters;
 using VerticalLogistica.Domain.Interfaces;
 
-namespace VerticalLogistica.Tests
+namespace VerticalLogistica.Tests.Services
 {
     public class OrderServiceTests
     {
