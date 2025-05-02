@@ -8,9 +8,13 @@ namespace VerticalLogistica.Domain.Entities
 {
     public class Order
     {
+        public int Id { get; set; } 
         public int OrderId { get; set; }
         public DateTime Date { get; set; }
-        public List<Product> Products { get; set; } = new List<Product>();
         public decimal Total { get; set; }
+
+        public List<Product> Products { get; set; } = new();
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }

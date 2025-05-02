@@ -14,10 +14,18 @@ namespace VerticalLogistica.Infrastructure.Mappings
         public void Configure(EntityTypeBuilder<Product> builder)
         {
             builder.ToTable("Products");
-            builder.HasKey(p => p.ProductId);
-            builder.Property(p => p.ProductId).ValueGeneratedNever();
-            builder.Property(p => p.Value).HasColumnType("decimal(18,2)");
+
+            builder.HasKey(p => p.Id);
+            builder.Property(p => p.Id).ValueGeneratedOnAdd();
+
+            builder.Property(p => p.ProductId).IsRequired(); // ID lógico do arquivo
+            builder.Property(p => p.Value)
+                   .HasColumnType("decimal(18,2)")
+                   .IsRequired();
+
+            builder.Property(p => p.OrderId).IsRequired(); // FK clara
         }
+
     }
 
 }

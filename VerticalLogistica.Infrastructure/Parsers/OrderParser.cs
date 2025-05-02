@@ -21,51 +21,24 @@ namespace VerticalLogistica.Infrastructure.Parsers
         public IEnumerable<RawOrder> ParseOrderFile(StreamReader reader)
         {
             var result = new List<RawOrder>();
-
             string? line;
             while ((line = reader.ReadLine()) != null)
             {
                 try
                 {
                     if (line.Length < UserIdLength + UserNameLength + OrderIdLength + ProductIdLength + ProductValueLength + PurchaseDateLength)
-                    {
-                        continue; // Skip invalid lines
-                    }
+                        continue;
 
                     int position = 0;
-
-                    // Parse User ID (10 digits)
-                    string userIdStr = line.Substring(position, UserIdLength);
-                    position += UserIdLength;
-                    int userId = int.Parse(userIdStr);
-
-                    // Parse User Name (45 chars)
-                    string userName = line.Substring(position, UserNameLength).Trim();
-                    position += UserNameLength;
-
-                    // Parse Order ID (10 digits)
-                    string orderIdStr = line.Substring(position, OrderIdLength);
-                    position += OrderIdLength;
-                    int orderId = int.Parse(orderIdStr);
-
-                    // Parse Product ID (10 digits)
-                    string productIdStr = line.Substring(position, ProductIdLength);
-                    position += ProductIdLength;
-                    int productId = int.Parse(productIdStr);
-
-                    // Parse Product Value (12 chars)
-                    string productValueStr = line.Substring(position, ProductValueLength);
-                    position += ProductValueLength;
-                    decimal productValue = decimal.Parse(productValueStr, CultureInfo.InvariantCulture);
-
-                    // Parse Purchase Date (8 digits in yyyyMMdd format)
+                    int userId = int.Parse(line.Substring(position, UserIdLength)); position += UserIdLength;
+                    string userName = line.Substring(position, UserNameLength).Trim(); position += UserNameLength;
+                    int orderId = int.Parse(line.Substring(position, OrderIdLength)); position += OrderIdLength;
+                    int productId = int.Parse(line.Substring(position, ProductIdLength)); position += ProductIdLength;
+                    decimal productValue = decimal.Parse(line.Substring(position, ProductValueLength), CultureInfo.InvariantCulture); position += ProductValueLength;
                     string purchaseDateStr = line.Substring(position, PurchaseDateLength);
 
-                    if (!DateTime.TryParseExact(purchaseDateStr, "yyyyMMdd", CultureInfo.InvariantCulture,
-                            DateTimeStyles.None, out DateTime purchaseDate))
-                    {
-                        continue; // Skip lines with invalid dates
-                    }
+                    if (!DateTime.TryParseExact(purchaseDateStr, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime purchaseDate))
+                        continue;
 
                     result.Add(new RawOrder
                     {
@@ -77,14 +50,15 @@ namespace VerticalLogistica.Infrastructure.Parsers
                         PurchaseDate = purchaseDate
                     });
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // Skip lines that can't be parsed
+                    Console.WriteLine($"Erro ao processar linha: {line} - {ex.Message}");
                     continue;
                 }
             }
-
             return result;
         }
+
     }
+
 }

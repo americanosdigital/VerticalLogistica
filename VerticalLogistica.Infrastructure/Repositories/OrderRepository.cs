@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,41 +7,40 @@ using System.Threading.Tasks;
 using VerticalLogistica.Domain.Entities;
 using VerticalLogistica.Domain.Filters;
 using VerticalLogistica.Domain.Interfaces;
+using VerticalLogistica.Infrastructure.Context;
 
 namespace VerticalLogistica.Infrastructure.Repositories
 {
+
     public class OrderRepository : IOrderRepository
     {
         private readonly IOrderParser _orderParser;
-        private List<User> _users = new List<User>();
+        private readonly AppDbContext _context;
 
-        public OrderRepository(IOrderParser orderParser)
+        public OrderRepository(IOrderParser orderParser, AppDbContext context)
         {
             _orderParser = orderParser;
+            _context = context;
         }
 
         public async Task ProcessOrderFileAsync(Stream fileStream)
         {
-            // Reset data store
-            _users = new List<User>();
-
-            // Parse the raw orders from the file
             using var reader = new StreamReader(fileStream);
             var rawOrders = _orderParser.ParseOrderFile(reader).ToList();
 
-            // Group by UserId to create User objects
             var userGroups = rawOrders.GroupBy(ro => ro.UserId);
 
             foreach (var userGroup in userGroups)
             {
                 var firstUserRecord = userGroup.First();
+
                 var user = new User
                 {
                     UserId = firstUserRecord.UserId,
-                    Name = firstUserRecord.UserName
+                    Name = firstUserRecord.UserName,
+                    Orders = new List<Order>()
                 };
 
-                // Group by OrderId to create Order objects
                 var orderGroups = userGroup.GroupBy(ro => ro.OrderId);
 
                 foreach (var orderGroup in orderGroups)
@@ -53,7 +53,6 @@ namespace VerticalLogistica.Infrastructure.Repositories
                         Products = new List<Product>()
                     };
 
-                    // Create Product objects
                     foreach (var rawOrder in orderGroup)
                     {
                         order.Products.Add(new Product
@@ -63,63 +62,34 @@ namespace VerticalLogistica.Infrastructure.Repositories
                         });
                     }
 
-                    // Calculate total (sum of product values)
                     order.Total = order.Products.Sum(p => p.Value);
                     user.Orders.Add(order);
                 }
 
-                _users.Add(user);
+                _context.Users.Add(user);
             }
 
-            await Task.CompletedTask; // Simulating asynchronous operation
+            await _context.SaveChangesAsync(); 
         }
 
         public async Task<IEnumerable<User>> GetOrdersAsync(OrderFilter? filter = null)
         {
-            if (filter == null)
-            {
-                return _users;
-            }
+            var query = _context.Users
+                .Include(u => u.Orders)
+                .ThenInclude(o => o.Products)
+                .AsQueryable();
 
-            var filteredUsers = new List<User>();
+            if (filter?.OrderId.HasValue == true)
+                query = query.Where(u => u.Orders.Any(o => o.OrderId == filter.OrderId.Value));
 
-            // Apply filters
-            foreach (var user in _users)
-            {
-                var filteredOrders = user.Orders.AsEnumerable();
+            if (filter?.StartDate.HasValue == true)
+                query = query.Where(u => u.Orders.Any(o => o.Date >= filter.StartDate.Value));
 
-                // Filter by OrderId if specified
-                if (filter.OrderId.HasValue)
-                {
-                    filteredOrders = filteredOrders.Where(o => o.OrderId == filter.OrderId.Value);
-                }
+            if (filter?.EndDate.HasValue == true)
+                query = query.Where(u => u.Orders.Any(o => o.Date <= filter.EndDate.Value));
 
-                // Filter by date range if specified
-                if (filter.StartDate.HasValue)
-                {
-                    filteredOrders = filteredOrders.Where(o => o.Date >= filter.StartDate.Value);
-                }
-
-                if (filter.EndDate.HasValue)
-                {
-                    filteredOrders = filteredOrders.Where(o => o.Date <= filter.EndDate.Value);
-                }
-
-                var ordersList = filteredOrders.ToList();
-
-                // Add user to result if they have matching orders
-                if (ordersList.Any())
-                {
-                    filteredUsers.Add(new User
-                    {
-                        UserId = user.UserId,
-                        Name = user.Name,
-                        Orders = ordersList
-                    });
-                }
-            }
-
-            return await Task.FromResult(filteredUsers);
+            return await query.ToListAsync();
         }
     }
+
 }

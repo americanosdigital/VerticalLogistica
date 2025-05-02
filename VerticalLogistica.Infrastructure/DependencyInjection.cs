@@ -14,10 +14,8 @@ namespace VerticalLogistica.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            // Register repositories
-            services.AddSingleton<IOrderRepository, OrderRepository>();
 
-            // Register parsers
+            services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddSingleton<IOrderParser, OrderParser>();
 
             return services;

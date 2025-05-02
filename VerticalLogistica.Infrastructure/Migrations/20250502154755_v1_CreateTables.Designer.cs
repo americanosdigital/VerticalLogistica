@@ -12,7 +12,7 @@ using VerticalLogistica.Infrastructure.Context;
 namespace VerticalLogistica.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250430222257_v1_CreateTables")]
+    [Migration("20250502154755_v1_CreateTables")]
     partial class v1_CreateTables
     {
         /// <inheritdoc />
@@ -27,19 +27,25 @@ namespace VerticalLogistica.Infrastructure.Migrations
 
             modelBuilder.Entity("VerticalLogistica.Domain.Entities.Order", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("OrderId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
@@ -48,16 +54,22 @@ namespace VerticalLogistica.Infrastructure.Migrations
 
             modelBuilder.Entity("VerticalLogistica.Domain.Entities.Product", b =>
                 {
-                    b.Property<int>("ProductId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("OrderId")
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("ProductId");
+                    b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
@@ -108,18 +120,24 @@ namespace VerticalLogistica.Infrastructure.Migrations
 
             modelBuilder.Entity("VerticalLogistica.Domain.Entities.Order", b =>
                 {
-                    b.HasOne("VerticalLogistica.Domain.Entities.User", null)
+                    b.HasOne("VerticalLogistica.Domain.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("VerticalLogistica.Domain.Entities.Product", b =>
                 {
-                    b.HasOne("VerticalLogistica.Domain.Entities.Order", null)
+                    b.HasOne("VerticalLogistica.Domain.Entities.Order", "Order")
                         .WithMany("Products")
                         .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("VerticalLogistica.Domain.Entities.Order", b =>

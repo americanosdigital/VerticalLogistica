@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using FluentAssertions;
 using Moq;
@@ -13,6 +14,7 @@ using VerticalLogistica.Application.Services;
 using VerticalLogistica.Domain.Filters;
 using VerticalLogistica.Infrastructure.Parsers;
 using VerticalLogistica.Infrastructure.Repositories;
+using VerticalLogistica.Infrastructure.Context;
 
 namespace VerticalLogistica.Tests.Integration
 {
@@ -21,9 +23,12 @@ namespace VerticalLogistica.Tests.Integration
         [Fact]
         public async Task ProcessOrderFile_EndToEnd_ShouldWorkCorrectly()
         {
+            var options = new DbContextOptionsBuilder<AppDbContext>().UseInMemoryDatabase(databaseName: "TestDb").Options;
+
             // Arrange - Setup the service chain
+            var context = new AppDbContext(options);
             var parser = new OrderParser();
-            var repository = new OrderRepository(parser);
+            var repository = new OrderRepository(parser, context); 
             var service = new OrderService(repository);
 
             // Create a sample file

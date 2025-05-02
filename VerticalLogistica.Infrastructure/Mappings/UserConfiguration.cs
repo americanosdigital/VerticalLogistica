@@ -16,17 +16,15 @@ namespace VerticalLogistica.Infrastructure.Mappings
             builder.ToTable("Users");
 
             builder.HasKey(u => u.UserId);
-
-            builder.Property(u => u.UserId)
-                   .ValueGeneratedNever();
-
-            builder.Property(u => u.Name)
-                   .HasMaxLength(100)
-                   .IsRequired();
+            builder.Property(u => u.UserId).ValueGeneratedNever();
+            builder.Property(u => u.Name).HasMaxLength(100).IsRequired();
 
             builder.HasMany(u => u.Orders)
-                   .WithOne()
+                   .WithOne(o => o.User)
+                   .HasForeignKey(o => o.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
         }
+ 
     }
+
 }

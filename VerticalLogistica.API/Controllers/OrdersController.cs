@@ -54,15 +54,28 @@ namespace VerticalLogistica.API.Controllers
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> UploadOrderFile(IFormFile? file)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("Nenhum arquivo foi enviado.");
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return BadRequest("Nenhum arquivo foi enviado.");
 
-            using var stream = file.OpenReadStream();
-            await _orderService.ProcessOrderFileAsync(stream);
+                using var stream = file.OpenReadStream();
+                await _orderService.ProcessOrderFileAsync(stream);
 
-            return Ok(new { Message = "Arquivo processado com sucesso." });
+                return Ok(new { Message = "Arquivo processado com sucesso." });
+            }
+            catch (ApplicationException e)
+            {
+                return BadRequest(new { mensagem = e.Message });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new { mensagem = $"Falha ao salvar arquivo: {e.Message}" });
+            }
+
         }
     }
 }

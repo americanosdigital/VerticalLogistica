@@ -15,12 +15,16 @@ namespace VerticalLogistica.Infrastructure.Mappings
         {
             builder.ToTable("Orders");
 
-            builder.HasKey(o => o.OrderId);
-            builder.Property(o => o.OrderId).ValueGeneratedNever();
+            builder.HasKey(o => o.Id);
+            builder.Property(o => o.Id).ValueGeneratedOnAdd();
+
+            builder.Property(o => o.OrderId).IsRequired(); // ID lógico
             builder.Property(o => o.Date).IsRequired();
-            builder.Property(o => o.Total).HasColumnType("decimal(18,2)").IsRequired(); 
+            builder.Property(o => o.Total).HasColumnType("decimal(18,2)").IsRequired();
+
             builder.HasMany(o => o.Products)
-                   .WithOne()
+                   .WithOne(p => p.Order)
+                   .HasForeignKey(p => p.OrderId)
                    .OnDelete(DeleteBehavior.Cascade);
         }
     }
